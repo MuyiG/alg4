@@ -2,7 +2,7 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
 public class Outcast {
-    private WordNet wordNet;
+    private final WordNet wordNet;
     // constructor takes a WordNet object
     public Outcast(WordNet wordnet) {
         this.wordNet = wordnet;
@@ -33,12 +33,13 @@ public class Outcast {
 
     // see test client below
     public static void main(String[] args) {
-        WordNet wordnet = new WordNet(args[0], args[1]);
+        WordNet wordnet = new WordNet("input/wordnet/synsets.txt", "input/wordnet/hypernyms.txt");
         Outcast outcast = new Outcast(wordnet);
-        for (int t = 2; t < args.length; t++) {
-            In in = new In(args[t]);
+        String[] outcastFile = {"outcast5.txt", "outcast8.txt", "outcast11.txt"};
+        for (String temp : outcastFile) {
+            In in = new In("input/wordnet/" + temp);
             String[] nouns = in.readAllStrings();
-            StdOut.println(args[t] + ": " + outcast.outcast(nouns));
+            StdOut.println(temp + ": " + outcast.outcast(nouns));
         }
     }
 }
