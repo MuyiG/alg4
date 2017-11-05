@@ -61,7 +61,7 @@ public class PrintSeams {
     }
 
     public static void main(String[] args) {
-        String fileName = "input/seam/10x10.png";
+        String fileName = "input/seam/6x5.png";
         Picture picture = new Picture(fileName);
         StdOut.printf("%s (%d-by-%d image)\n", fileName, picture.width(), picture.height());
         StdOut.println();

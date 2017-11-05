@@ -60,15 +60,15 @@ public class SeamCarver {
         Picture transposePicture = new Picture(picture.height(), picture.width());
         for (int x = 0 ; x < picture.width(); x++) {
             for (int y = 0; y < picture.height(); y++) {
-                transposePicture.set(picture.height() - 1 - y, x, picture.get(x, y));
+                transposePicture.set(y, x, picture.get(x, y));
             }
         }
 
         picture = transposePicture;
         int[] seam = findVerticalSeam();
-        for (int i = 0; i < seam.length; i++) {
-            seam[i] = originalPicture.height() - seam[i];
-        }
+//        for (int i = 0; i < seam.length; i++) {
+//            seam[i] = originalPicture.height() - seam[i];
+//        }
         picture = originalPicture;
         return seam;
     }
