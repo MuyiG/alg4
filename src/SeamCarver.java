@@ -4,10 +4,16 @@ import java.awt.*;
 
 public class SeamCarver {
     private Picture picture;
+    private double[][] energys;
+    private double[][] distTo;
+    private int[][] edgeTo;
 
     // create a seam carver object based on the given picture
     public SeamCarver(Picture picture) {
         this.picture = new Picture(picture);
+        energys = new double[picture.height()][picture.width()];
+        distTo = new double[picture.height()][picture.width()];
+        edgeTo = new int[picture.height()][picture.width()];
     }
 
     // current picture
@@ -40,7 +46,6 @@ public class SeamCarver {
         Color y1 = picture.get(x, y - 1);
         Color y2 = picture.get(x, y + 1);
         return Math.sqrt(difference(x1, x2) + difference(y1, y2));
-
     }
 
     private double difference(Color c1, Color c2) {
@@ -51,16 +56,84 @@ public class SeamCarver {
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        return null;
+        Picture originalPicture = new Picture(picture);
+        Picture transposePicture = new Picture(picture.height(), picture.width());
+        for (int x = 0 ; x < picture.width(); x++) {
+            for (int y = 0; y < picture.height(); y++) {
+                transposePicture.set(picture.height() - 1 - y, x, picture.get(x, y));
+            }
+        }
+
+        picture = transposePicture;
+        int[] seam = findVerticalSeam();
+        for (int i = 0; i < seam.length; i++) {
+            seam[i] = originalPicture.height() - seam[i];
+        }
+        picture = originalPicture;
+        return seam;
     }
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        return null;
+        energys = new double[picture.height()][picture.width()];
+        distTo = new double[picture.height()][picture.width()];
+        edgeTo = new int[picture.height()][picture.width()];
+        for (int i = 0 ; i < picture.height(); i++) {
+            for (int j = 0; j < picture.width(); j++) {
+                energys[i][j] = energy(j, i);
+                if (i == 0) {
+                    distTo[i][j] = energys[i][j];
+                    edgeTo[i][j] = -1;
+                } else {
+                    distTo[i][j] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+
+        // topological order relax
+        for (int i = 0 ; i < picture.height(); i++) {
+            for (int j = 0; j < picture.width(); j++) {
+                relax(i , j);
+            }
+        }
+
+        double minDist = Double.POSITIVE_INFINITY;
+        int minPos = 0;
+        for (int j = 0; j < picture.width(); j++) {
+            if (distTo[picture.height() - 1][j] < minDist) {
+                minDist = distTo[picture.height() - 1][j];
+                minPos = j;
+            }
+        }
+        int[] seam = new int[picture.height()];
+        for (int k = picture.height() - 1; k >= 0; k--) {
+            seam[k] = minPos;
+            minPos = edgeTo[k][minPos];
+        }
+        return seam;
+    }
+
+    // not elegant...
+    private void relax(int i, int j) {
+        if (i < picture.height() - 1) {
+            if (j > 0 && distTo[i + 1][j - 1] > distTo[i][j] + energys[i + 1][j - 1]) {
+                distTo[i + 1][j - 1] = distTo[i][j] + energys[i + 1][j - 1];
+                edgeTo[i + 1][j - 1] = j;
+            }
+            if (distTo[i + 1][j] > distTo[i][j] + energys[i + 1][j]) {
+                distTo[i + 1][j] = distTo[i][j] + energys[i + 1][j];
+                edgeTo[i + 1][j] = j;
+            }
+            if (j < picture.width() - 1 && distTo[i + 1][j + 1] > energys[i][j] + energys[i + 1][j + 1]) {
+                distTo[i + 1][j + 1] = distTo[i][j] + energys[i + 1][j + 1];
+                edgeTo[i + 1][j + 1] = j;
+            }
+        }
     }
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
+
     }
 
     // remove vertical seam from current picture

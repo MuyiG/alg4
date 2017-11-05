@@ -15,7 +15,7 @@ import edu.princeton.cs.algs4.StdOut;
 public class PrintEnergy {
 
     public static void main(String[] args) {
-        Picture picture = new Picture("input/seam/3x7.png");
+        Picture picture = new Picture("input/seam/5x6.png");
         StdOut.printf("image is %d pixels wide by %d pixels high.\n", picture.width(), picture.height());
         
         SeamCarver sc = new SeamCarver(picture);
