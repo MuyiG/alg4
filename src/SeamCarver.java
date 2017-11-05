@@ -57,18 +57,8 @@ public class SeamCarver {
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
         Picture originalPicture = new Picture(picture);
-        Picture transposePicture = new Picture(picture.height(), picture.width());
-        for (int x = 0 ; x < picture.width(); x++) {
-            for (int y = 0; y < picture.height(); y++) {
-                transposePicture.set(y, x, picture.get(x, y));
-            }
-        }
-
-        picture = transposePicture;
+        picture = transpose(picture);
         int[] seam = findVerticalSeam();
-//        for (int i = 0; i < seam.length; i++) {
-//            seam[i] = originalPicture.height() - seam[i];
-//        }
         picture = originalPicture;
         return seam;
     }
@@ -133,11 +123,35 @@ public class SeamCarver {
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
-
+        Picture originalPicture = new Picture(picture);
+        picture = transpose(picture);
+        removeVerticalSeam(seam);
+        picture = originalPicture;
     }
 
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
+        if (seam == null || seam.length != picture.height()) {
+            throw new IllegalArgumentException();
+        }
+        Picture newPicture = new Picture(picture.width() - 1, picture.height());
+        for (int i = 0 ; i < picture.height(); i++) {
+            for (int j = 0; j < picture.width(); j++) {
+                if (j != seam[i]) {
+                    newPicture.set(j, i, picture.get(j, i));
+                }
+            }
+        }
+        picture = newPicture;
+    }
 
+    private Picture transpose(Picture picture) {
+        Picture transposePicture = new Picture(picture.height(), picture.width());
+        for (int x = 0 ; x < picture.width(); x++) {
+            for (int y = 0; y < picture.height(); y++) {
+                transposePicture.set(y, x, picture.get(x, y));
+            }
+        }
+        return transposePicture;
     }
 }
