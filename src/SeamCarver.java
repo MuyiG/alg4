@@ -1,6 +1,7 @@
 import edu.princeton.cs.algs4.Picture;
 
-import java.awt.*;
+import java.awt.Color;
+
 
 public class SeamCarver {
     private Picture picture;
@@ -33,11 +34,11 @@ public class SeamCarver {
 
     // energy of pixel at column x and row y
     public double energy(int x, int y) {
-        if (x < 0 || x > picture.width() -1 || y < 0 || y > picture.height() - 1) {
+        if (x < 0 || x > picture.width() - 1 || y < 0 || y > picture.height() - 1) {
             throw new IllegalArgumentException();
         }
 
-        if (x == 0 || x == picture.width() -1 || y == 0 || y == picture.height() -1) {
+        if (x == 0 || x == picture.width() - 1 || y == 0 || y == picture.height() - 1) {
             return 1000;
         }
 
@@ -68,7 +69,7 @@ public class SeamCarver {
         energys = new double[picture.height()][picture.width()];
         distTo = new double[picture.height()][picture.width()];
         edgeTo = new int[picture.height()][picture.width()];
-        for (int i = 0 ; i < picture.height(); i++) {
+        for (int i = 0; i < picture.height(); i++) {
             for (int j = 0; j < picture.width(); j++) {
                 energys[i][j] = energy(j, i);
                 if (i == 0) {
@@ -81,9 +82,9 @@ public class SeamCarver {
         }
 
         // topological order relax
-        for (int i = 0 ; i < picture.height(); i++) {
+        for (int i = 0; i < picture.height(); i++) {
             for (int j = 0; j < picture.width(); j++) {
-                relax(i , j);
+                relax(i, j);
             }
         }
 
@@ -135,7 +136,7 @@ public class SeamCarver {
             throw new IllegalArgumentException();
         }
         Picture newPicture = new Picture(picture.width() - 1, picture.height());
-        for (int i = 0 ; i < picture.height(); i++) {
+        for (int i = 0; i < picture.height(); i++) {
             for (int j = 0; j < picture.width(); j++) {
                 if (j != seam[i]) {
                     newPicture.set(j, i, picture.get(j, i));
@@ -147,7 +148,7 @@ public class SeamCarver {
 
     private Picture transpose(Picture picture) {
         Picture transposePicture = new Picture(picture.height(), picture.width());
-        for (int x = 0 ; x < picture.width(); x++) {
+        for (int x = 0; x < picture.width(); x++) {
             for (int y = 0; y < picture.height(); y++) {
                 transposePicture.set(y, x, picture.get(x, y));
             }
