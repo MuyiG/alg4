@@ -19,7 +19,7 @@ public class SeamCarver {
 
     // current picture
     public Picture picture() {
-        return picture;
+        return new Picture(picture);
     }
 
     // width of current picture
@@ -163,5 +163,11 @@ public class SeamCarver {
             }
         }
         return transposePicture;
+    }
+
+    public static void main(String[] args) {
+        SeamCarver seamCarver = new SeamCarver(new Picture("input/seam/6x5.png"));
+        seamCarver.removeVerticalSeam(null);
+
     }
 }
