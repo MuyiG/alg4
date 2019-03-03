@@ -1,5 +1,6 @@
 package baseball;
 
+import edu.princeton.cs.algs4.FlowNetwork;
 import edu.princeton.cs.algs4.In;
 
 import java.util.Arrays;
@@ -90,15 +91,29 @@ public class BaseballElimination {
         int id2 = teams.get(team2).id;
         return against[id1][id2];
     }
-//
-//    // is given team eliminated?
-//    public boolean isEliminated(String team) {
-//
-//    }
-//
-//    // subset R of teams that eliminates given team; null if not eliminated
-//    public Iterable<String> certificateOfElimination(String team) {
-//    }
+
+    // is given team eliminated?
+    public boolean isEliminated(String team) {
+        if (teams.size() == 1) {
+            // deals with cases like teams1.txt
+            return false;
+        }
+        Team target = teams.get(team);
+        // Trivial elimination.
+        for (Team temp : teams.values()) {
+            if (!temp.getName().equals(team) && temp.wins >= target.wins + target.remaining) {
+                return true;
+            }
+        }
+
+        // Nontrivial elimination: use maxflow
+        return false;
+    }
+
+    // subset R of teams that eliminates given team; null if not eliminated
+    public Iterable<String> certificateOfElimination(String team) {
+        return null;
+    }
 
     public static void main(String[] args) {
         BaseballElimination division = new BaseballElimination(args[0]);
