@@ -1,11 +1,8 @@
 package baseball;
 
-import edu.princeton.cs.algs4.FlowNetwork;
-import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BaseballElimination {
 
@@ -47,7 +44,7 @@ public class BaseballElimination {
     public BaseballElimination(String filename) {
         In in = new In("input/baseball/" + filename);
         int n = in.readInt();
-        teams = new HashMap<>();
+        teams = new LinkedHashMap<>();
         against = new int[n][n];
         for (int i = 0; i < n; i++) {
             String teamName = in.readString();
@@ -92,6 +89,15 @@ public class BaseballElimination {
         return against[id1][id2];
     }
 
+    private Team getTeamById(int id) {
+        for (Team team : teams.values()) {
+            if (team.id == id) {
+                return team;
+            }
+        }
+        throw new IllegalArgumentException("Invalid id");
+    }
+
     // is given team eliminated?
     public boolean isEliminated(String team) {
         if (teams.size() == 1) {
@@ -107,32 +113,99 @@ public class BaseballElimination {
         }
 
         // Nontrivial elimination: use maxflow
+        FlowNetwork flowNetwork = buildFlow(team);
+        new FordFulkerson(flowNetwork, 0, flowNetwork.V() - 1);
+        for (FlowEdge flowEdge : flowNetwork.adj(0)) {
+            if (flowEdge.flow() < flowEdge.capacity()) {
+                return true;
+            }
+        }
         return false;
+    }
+
+    private FlowNetwork buildFlow(String targetTeamName) {
+        Team target = teams.get(targetTeamName);
+        int n = numberOfTeams();
+        int againstVertexNum = (n * (n - 1)) / 2;
+        FlowNetwork flowNetwork = new FlowNetwork(againstVertexNum + n + 2);
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                int againstNum = against[i][j];
+                if (againstNum > 0) {
+                    int againstIndex = getAgainstIndex(i, j);
+                    flowNetwork.addEdge(new FlowEdge(0, againstIndex, againstNum));
+                    flowNetwork.addEdge(new FlowEdge(againstIndex, againstVertexNum + i + 1, Double.MAX_VALUE));
+                    flowNetwork.addEdge(new FlowEdge(againstIndex, againstVertexNum + j + 1, Double.MAX_VALUE));
+                }
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            int capacity = target.wins + target.remaining - getTeamById(i).wins;
+            if (capacity > 0) {
+                flowNetwork.addEdge(new FlowEdge(againstVertexNum + i + 1, flowNetwork.V() - 1, capacity));
+            }
+        }
+        System.out.println("target:" + targetTeamName + ", FlowNetwork:" + flowNetwork);
+        return flowNetwork;
+    }
+
+    private int getAgainstIndex(int i, int j) {
+        int index = j - i;
+        for (int k = 0; k < i; k++) {
+            index += numberOfTeams() - 1 - k;
+        }
+        return index;
     }
 
     // subset R of teams that eliminates given team; null if not eliminated
     public Iterable<String> certificateOfElimination(String team) {
-        return null;
+        if (!isEliminated(team)) {
+            return null;
+        }
+        Set<String> result = new HashSet<>();
+        // Trivial elimination.
+        Team target = teams.get(team);
+        for (Team temp : teams.values()) {
+            if (!temp.getName().equals(team) && temp.wins > target.wins + target.remaining) {
+                result.add(temp.name);
+            }
+        }
+        // Nontrivial elimination: use maxflow
+        FlowNetwork flowNetwork = buildFlow(team);
+        FordFulkerson fordFulkerson = new FordFulkerson(flowNetwork, 0, flowNetwork.V() - 1);
+        int n = numberOfTeams();
+        int againstVertexNum = (n * (n - 1)) / 2;
+        for (int i = 0; i < n; i++) {
+            if (fordFulkerson.inCut(againstVertexNum + i + 1)) {
+                result.add(getTeamById(i).name);
+            }
+        }
+        return result;
     }
 
     public static void main(String[] args) {
         BaseballElimination division = new BaseballElimination(args[0]);
-        System.out.println(division.numberOfTeams());
-        System.out.println(division.teams());
-        System.out.println(division.wins("Hufflepuff"));
-        System.out.println(division.losses("Gryffindor"));
-        System.out.println(division.remaining("Ravenclaw"));
-        System.out.println(division.against("Hufflepuff", "Slytherin"));
-//        for (String team : division.teams()) {
-//            if (division.isEliminated(team)) {
-//                StdOut.print(team + " is eliminated by the subset R = { ");
-//                for (String t : division.certificateOfElimination(team)) {
-//                    StdOut.print(t + " ");
-//                }
-//                StdOut.println("}");
-//            } else {
-//                StdOut.println(team + " is not eliminated");
-//            }
-//        }
+//        System.out.println(division.numberOfTeams());
+//        System.out.println(division.teams());
+//        System.out.println(division.wins("Hufflepuff"));
+//        System.out.println(division.losses("Gryffindor"));
+//        System.out.println(division.remaining("Ravenclaw"));
+//        System.out.println(division.against("Hufflepuff", "Slytherin"));
+//        System.out.println(division.isEliminated("Gryffindor"));
+//        System.out.println(division.getAgainstIndex(0, 3));
+//        System.out.println(division.getAgainstIndex(1, 2));
+//        System.out.println(division.getAgainstIndex(2, 3));
+
+        for (String team : division.teams()) {
+            if (division.isEliminated(team)) {
+                StdOut.print(team + " is eliminated by the subset R = { ");
+                for (String t : division.certificateOfElimination(team)) {
+                    StdOut.print(t + " ");
+                }
+                StdOut.println("}");
+            } else {
+                StdOut.println(team + " is not eliminated");
+            }
+        }
     }
 }
