@@ -1,7 +1,9 @@
 # I
 
 # II
-## Week1 - WordNet
-* WordNet
-* SAP
-* Outcast
+## Week 1 - WordNet
+* wordnet.WordNet
+* wordnet.SAP
+* wordnet.Outcast
+
+## Week 3 - Maxflow and mincut
