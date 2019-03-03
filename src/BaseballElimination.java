@@ -1,6 +1,13 @@
-import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.FlowEdge;
+import edu.princeton.cs.algs4.FlowNetwork;
+import edu.princeton.cs.algs4.FordFulkerson;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class BaseballElimination {
 
@@ -40,7 +47,7 @@ public class BaseballElimination {
 
     // create a baseball division from given filename in format specified below
     public BaseballElimination(String filename) {
-        In in = new In("input/baseball/" + filename);
+        In in = new In(filename);
         int n = in.readInt();
         teams = new LinkedHashMap<>();
         against = new int[n][n];
@@ -51,8 +58,8 @@ public class BaseballElimination {
                 against[i][j] = in.readInt();
             }
         }
-        System.out.println(teams);
-        System.out.println(Arrays.deepToString(against));
+//        System.out.println(teams);
+//        System.out.println(Arrays.deepToString(against));
     }
 
     // number of teams
@@ -132,8 +139,8 @@ public class BaseballElimination {
                 if (againstNum > 0) {
                     int againstIndex = getAgainstIndex(i, j);
                     flowNetwork.addEdge(new FlowEdge(0, againstIndex, againstNum));
-                    flowNetwork.addEdge(new FlowEdge(againstIndex, againstVertexNum + i + 1, Double.MAX_VALUE));
-                    flowNetwork.addEdge(new FlowEdge(againstIndex, againstVertexNum + j + 1, Double.MAX_VALUE));
+                    flowNetwork.addEdge(new FlowEdge(againstIndex, againstVertexNum + i + 1, Double.POSITIVE_INFINITY));
+                    flowNetwork.addEdge(new FlowEdge(againstIndex, againstVertexNum + j + 1, Double.POSITIVE_INFINITY));
                 }
             }
         }
@@ -143,7 +150,7 @@ public class BaseballElimination {
                 flowNetwork.addEdge(new FlowEdge(againstVertexNum + i + 1, flowNetwork.V() - 1, capacity));
             }
         }
-        System.out.println("target:" + targetTeamName + ", FlowNetwork:" + flowNetwork);
+//        System.out.println("target:" + targetTeamName + ", FlowNetwork:" + flowNetwork);
         return flowNetwork;
     }
 
