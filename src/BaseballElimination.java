@@ -74,24 +74,39 @@ public class BaseballElimination {
 
     // number of wins for given team
     public int wins(String team) {
-        return teams.get(team).wins;
+        Team t = teams.get(team);
+        if (t == null) {
+            throw new IllegalArgumentException();
+        }
+        return t.wins;
     }
 
     // number of losses for given team
     public int losses(String team) {
-        return teams.get(team).losses;
+        Team t = teams.get(team);
+        if (t == null) {
+            throw new IllegalArgumentException();
+        }
+        return t.losses;
     }
 
     // number of remaining games for given team
     public int remaining(String team) {
-        return teams.get(team).remaining;
+        Team t = teams.get(team);
+        if (t == null) {
+            throw new IllegalArgumentException();
+        }
+        return t.remaining;
     }
 
     // number of remaining games between team1 and team2
     public int against(String team1, String team2) {
-        int id1 = teams.get(team1).id;
-        int id2 = teams.get(team2).id;
-        return against[id1][id2];
+        Team t1 = teams.get(team1);
+        Team t2 = teams.get(team2);
+        if (t1 == null || t2 == null) {
+            throw new IllegalArgumentException();
+        }
+        return against[t1.id][t2.id];
     }
 
     private Team getTeamById(int id) {
@@ -105,14 +120,17 @@ public class BaseballElimination {
 
     // is given team eliminated?
     public boolean isEliminated(String team) {
+        Team t = teams.get(team);
+        if (t == null) {
+            throw new IllegalArgumentException();
+        }
         if (teams.size() == 1) {
             // deals with cases like teams1.txt
             return false;
         }
-        Team target = teams.get(team);
         // Trivial elimination.
         for (Team temp : teams.values()) {
-            if (!temp.getName().equals(team) && temp.wins >= target.wins + target.remaining) {
+            if (!temp.getName().equals(team) && temp.wins > t.wins + t.remaining) {
                 return true;
             }
         }
