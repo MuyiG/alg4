@@ -1,7 +1,10 @@
 # I
 
 # II
-## Week1 - WordNet
+## Week 1 - WordNet
 * WordNet
 * SAP
 * Outcast
+
+## Week 3 - Maxflow and mincut
+* BaseballElimination
