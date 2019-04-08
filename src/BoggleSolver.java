@@ -1,9 +1,19 @@
 import edu.princeton.cs.algs4.Graph;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class BoggleSolver {
+
+    private Set<String> words;
+
+    boolean[] marked;
+    int[] edgeTo;
+
     // Initializes the data structure using the given array of strings as the dictionary.
     // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
     public BoggleSolver(String[] dictionary) {
+        words = new HashSet<>();
 
     }
 
@@ -11,11 +21,10 @@ public class BoggleSolver {
     public Iterable<String> getAllValidWords(BoggleBoard board) {
         int m = board.rows(), n = board.cols();
         Graph graph = buildGraph(m, n);
-        boolean[] marked = new boolean[m * n];
-        int[] edgeTo = new int[m * n];
-
+        marked = new boolean[m * n];
+        edgeTo = new int[m * n];
         for (int v = 0; v < graph.V(); v++) {
-
+            dfs(graph, v);
         }
 
         return null;
@@ -41,6 +50,18 @@ public class BoggleSolver {
             }
         }
         return graph;
+    }
+
+    private void dfs(Graph graph, int v) {
+        marked[v] = true;
+        for (int w : graph.adj(v)) {
+            if (!marked[w]) {
+                dfs(graph, w);
+                edgeTo[w] = v;
+            }
+        }
+        marked[v] = false;
+        // ???
     }
 
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
