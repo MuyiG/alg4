@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.Stack;
 
 public class BoggleSolver {
-    private final PrefixTrie<String> dictionaryTrie;
+    private final PrefixTrie<Integer> dictionaryTrie;
 
     private Set<String> validWords;
 
@@ -19,7 +19,7 @@ public class BoggleSolver {
     public BoggleSolver(String[] dictionary) {
         dictionaryTrie = new PrefixTrie<>();
         for (String temp : dictionary) {
-            dictionaryTrie.put(temp, "1");
+            dictionaryTrie.put(temp, 1);
         }
     }
 
@@ -44,18 +44,18 @@ public class BoggleSolver {
         Graph graph = new Graph(m * n);
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                int v = i * m + j;
+                int v = i * n + j;
                 if (i > 0 && j < n - 1) {
-                    graph.addEdge(v, (i - 1) * m + j + 1);
+                    graph.addEdge(v, (i - 1) * n + j + 1);
                 }
                 if (i < m - 1) {
-                    graph.addEdge(v, (i + 1) * m + j);
+                    graph.addEdge(v, (i + 1) * n + j);
                     if (j < n - 1) {
-                        graph.addEdge(v, (i + 1) * m + j + 1);
+                        graph.addEdge(v, (i + 1) * n + j + 1);
                     }
                 }
                 if (j < n - 1) {
-                    graph.addEdge(v, i * m + j + 1);
+                    graph.addEdge(v, i * n + j + 1);
                 }
             }
         }
@@ -107,6 +107,9 @@ public class BoggleSolver {
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word) {
+        if (!dictionaryTrie.contains(word)) {
+            return 0;
+        }
         int length = word.length();
         if (length <= 2) {
             return 0;
@@ -134,7 +137,8 @@ public class BoggleSolver {
 
         testGetAllValidWords(solver, new BoggleBoard("input/boggle/board4x4.txt"));
         testGetAllValidWords(solver, new BoggleBoard("input/boggle/board-points1.txt"));
-
+        testGetAllValidWords(solver, new BoggleBoard("input/boggle/board-dichlorodiphenyltrichloroethanes.txt"));
+        testGetAllValidWords(solver, new BoggleBoard("input/boggle/board-pneumonoultramicroscopicsilicovolcanoconiosis.txt"));
     }
 
     private static void testGetAllValidWords(BoggleSolver solver, BoggleBoard board) {
