@@ -1,14 +1,12 @@
 import edu.princeton.cs.algs4.Graph;
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.TrieST;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
 public class BoggleSolver {
-
-    private final TrieST<String> dictionaryTrie;
+    private final PrefixTrie<String> dictionaryTrie;
 
     private Set<String> validWords;
 
@@ -19,7 +17,7 @@ public class BoggleSolver {
     // Initializes the data structure using the given array of strings as the dictionary.
     // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
     public BoggleSolver(String[] dictionary) {
-        dictionaryTrie = new TrieST<>();
+        dictionaryTrie = new PrefixTrie<>();
         for (String temp : dictionary) {
             dictionaryTrie.put(temp, "1");
         }
@@ -66,16 +64,13 @@ public class BoggleSolver {
 
     private void dfs(Graph graph, int v) {
         marked[v] = true;
+
         // backtracking optimization
         String str = getStringToV(v);
-        long begin = System.currentTimeMillis();
-        // TODO 更高效的Prefix判断
-        if (!dictionaryTrie.keysWithPrefix(str).iterator().hasNext()) {
-            System.out.println("keysWithPrefix miss: " + (System.currentTimeMillis() - begin) + " ms");
+        if (!dictionaryTrie.isPrefixExist(str)) {
             marked[v] = false;
             return;
         }
-        System.out.println("keysWithPrefix hit: " + (System.currentTimeMillis() - begin) + " ms");
 
         for (int w : graph.adj(v)) {
             if (!marked[w]) {
@@ -112,14 +107,7 @@ public class BoggleSolver {
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word) {
-        int length = 0;
-        for (char c : word.toCharArray()) {
-            if (c == 'Q') {
-                length += 2;
-            } else {
-                length += 1;
-            }
-        }
+        int length = word.length();
         if (length <= 2) {
             return 0;
         } else if (length <= 4) {
@@ -138,18 +126,23 @@ public class BoggleSolver {
     public static void main(String[] args) {
         In in = new In("input/boggle/dictionary-yawl.txt");
         BoggleSolver solver = new BoggleSolver(in.readAllLines());
-//        for (int i = 0; i < 10; i++) {
-            BoggleBoard board = new BoggleBoard();
-            System.out.println(board);
-            System.out.println(solver.getAllValidWords(board));
+//        for (int i = 0; i < 50; i++) {
+//            BoggleBoard board = new BoggleBoard();
+//            System.out.println(board);
+//            System.out.println(solver.getAllValidWords(board));
 //        }
 
-//        BoggleBoard board = new BoggleBoard("input/boggle/board-q.txt");
-//        int score = 0, count = 0;
-//        for (String temp : solver.getAllValidWords(board)) {
-//            score += solver.scoreOf(temp);
-//            count++;
-//        }
-//        System.out.println("Score: " + score + ", Count: " + count);
+        testGetAllValidWords(solver, new BoggleBoard("input/boggle/board4x4.txt"));
+        testGetAllValidWords(solver, new BoggleBoard("input/boggle/board-points1.txt"));
+
+    }
+
+    private static void testGetAllValidWords(BoggleSolver solver, BoggleBoard board) {
+        int score = 0, count = 0;
+        for (String temp : solver.getAllValidWords(board)) {
+            score += solver.scoreOf(temp);
+            count++;
+        }
+        System.out.println("Score: " + score + ", Count: " + count);
     }
 }
