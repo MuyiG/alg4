@@ -3,8 +3,8 @@ public class CircularSuffixArray {
 
     private static final int R = 256;
 
-    private String originalString;
-    private int[] index;
+    private final String originalString;
+    private final int[] index;
 
     // circular suffix array of s
     public CircularSuffixArray(String s) {
@@ -12,8 +12,8 @@ public class CircularSuffixArray {
             throw new IllegalArgumentException();
         }
         originalString = s;
-        index = new int[s.length()];
         int n = originalString.length();
+        index = new int[n];
         for (int i = 0; i < n; i++) {
             index[i] = i;
         }
@@ -22,7 +22,7 @@ public class CircularSuffixArray {
         int[] temp = new int[n];
         for (int pos = n - 1; pos >= 0; pos--) {
             // count
-            for (int i = 0; i < R - 1; i++) {
+            for (int i = 0; i < R + 1; i++) {
                 count[i] = 0;
             }
             for (int i = 0; i < n; i++) {
@@ -56,7 +56,20 @@ public class CircularSuffixArray {
 
     // unit testing (required)
     public static void main(String[] args) {
-        CircularSuffixArray circularSuffixArray = new CircularSuffixArray("ABRACADABRA!");
+//        String s = "ABRACADABRA!";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append((char) 0x0a);
+        stringBuilder.append((char) 0x48);
+        stringBuilder.append((char) 0xde);
+        stringBuilder.append((char) 0x19);
+        stringBuilder.append((char) 0xff);
+        stringBuilder.append((char) 0x3f);
+        stringBuilder.append((char) 0x79);
+        stringBuilder.append((char) 0xce);
+        stringBuilder.append((char) 0x0e);
+        stringBuilder.append((char) 0x08);
+        String s = stringBuilder.toString();
+        CircularSuffixArray circularSuffixArray = new CircularSuffixArray(s);
         for (int i = 0; i < circularSuffixArray.length(); i++) {
             System.out.println(circularSuffixArray.index(i));
         }

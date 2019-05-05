@@ -22,7 +22,6 @@ public class MoveToFront {
                 }
             }
             BinaryStdOut.write(index, 8);
-            StdOut.printf("");
             sequence.addFirst(c);
         }
         BinaryStdOut.close();
